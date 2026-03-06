@@ -16,13 +16,13 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-        if: ${{ github.repository == 'alis-is/air' }}
+        if: ${{ github.repository == 'mavryk-network/application-image-repository' }}
         
       - uses: actions/checkout@v2
-        if: ${{ github.repository != 'alis-is/air' }}
+        if: ${{ github.repository != 'mavryk-network/application-image-repository' }}
         with:
-          token: ${{ secrets.AIR_AT }}
-          repository: alis-is/air
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: mavryk-network/application-image-repository
           
       - name: setup eli
         uses: alis-is/setup-eli@v1
@@ -46,17 +46,17 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with: 
           add: '${{ steps.create_definitions.outputs.UPDATED_DEFINITIONS }}'
-          push: ${{ github.repository == 'alis-is/air' }}  # --set-upstream origin ${{ github.event.client_payload.repository }}-new-release"   
+          push: ${{ github.repository == 'mavryk-network/application-image-repository' }}  # --set-upstream origin ${{ github.event.client_payload.repository }}-new-release"   
           message: ${{ github.event.client_payload.repository }} app-release
           author_name: AirAppReleaseDispatch
           author_email: air.app.release.dispatch@alis.is
 
-      - name: Create PR to alis-is/air
+      - name: Create PR to mavryk-network/application-image-repository
         id: cpr
         uses: peter-evans/create-pull-request@v3
-        if: ${{ github.repository != 'alis-is/air' }}
+        if: ${{ github.repository != 'mavryk-network/application-image-repository' }}
         with:
-          token: ${{ secrets.AIR_AT }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           push-to-fork: ${{ github.repository }}
           title: ${{ github.event.client_payload.id }}-${{ github.event.client_payload.version }}
           body: Update from nested AIR - ${{ github.event.client_payload.id }}-${{ github.event.client_payload.version }}
@@ -65,7 +65,7 @@ jobs:
       
       - name: Remove PR branch
         uses: actions/github-script@v5
-        if: ${{ github.repository != 'alis-is/air' }}
+        if: ${{ github.repository != 'mavryk-network/application-image-repository' }}
         env:
           PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
           BRANCH: ${{ github.event.client_payload.id }}-${{ github.event.client_payload.version }}
@@ -76,8 +76,8 @@ jobs:
             while (retries-- > 0) {
               try {
                 const mergeInfo = await github.rest.pulls.checkIfMerged({
-                  owner: "alis-is",
-                  repo: "air",
+                  owner: "mavryk-network",
+                  repo: "application-image-repository",
                   pull_number: Number(process.env.PR_NUMBER)
                 })
                 if (mergeInfo.status === 204) {

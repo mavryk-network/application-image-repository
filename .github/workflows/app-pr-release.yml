@@ -20,22 +20,22 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/github-script@v5
         id: set-result
-        if: ${{ github.repository == 'alis-is/air' }}
+        if: ${{ github.repository == 'mavryk-network/application-image-repository' }}
         env: 
           PR_NUMBER: ${{github.event.number}}
           TITLE: ${{ github.event.pull_request.title }}
           REQUIRED_PREFIX: "ami/definition/posmn/"
         with:
-          # github-token: ${{ secrets.AIR_AT }}
           script: |
             const requiredPrefixMap = {
               "posmn": "ami/definition/posmn/",
               "jpaarhuis": "ami/definition/posmn/",
               "BakeBuddyBot": "ami/definition/xtz/",
+              "MavrykCowbot": "ami/definition/mvrk/",
             }
             const prInfo = await github.rest.pulls.get({
-              owner: "alis-is",
-              repo: "air",
+              owner: "mavryk-network",
+              repo: "application-image-repository",
               pull_number: Number(process.env.PR_NUMBER)
             })
             if (!prInfo.data.mergeable) {
@@ -56,14 +56,14 @@ jobs:
             sourceRE.lastIndex = 0; // reset sourceRE
             const tartgetMatch = sourceRE.exec(prInfo.data.base.label)
             const target = tartgetMatch[1];
-            if (target != "alis-is") {
+            if (target != "mavryk-network") {
               console.error(`Not main public repository. Exiting...`)
               process.exit(0)
             }
 
             const prFiles = await github.rest.pulls.listFiles({
-              owner: "alis-is",
-              repo: "air",
+              owner: "mavryk-network",
+              repo: "application-image-repository",
               pull_number: Number(process.env.PR_NUMBER)
             })
 
